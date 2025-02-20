@@ -1,0 +1,38 @@
+name: Deploy with Environment Secrets
+
+on:
+  push:
+    branches:
+      - main  # Deploys to Dev
+    tags:
+      - 'v*'  # Matches all version tags (vX.Y.Z, vX.Y.Z-test)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ env.ENV_NAME }}  # Dynamically select environment
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Determine Deployment Target
+        id: set-env
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            echo "ENV_NAME=dev" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF#refs/tags/}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-test$ ]]; then
+            echo "ENV_NAME=test" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF#refs/tags/}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "ENV_NAME=prod" >> $GITHUB_ENV
+          else
+            echo "❌ Invalid Tag Format: ${GITHUB_REF}"
+            exit 1
+          fi
+
+      - name: Deploy to ${{ env.ENV_NAME }} Environment
+        env:
+          API_KEY: ${{ secrets.SECRET }}
+        run: |
+          echo "🚀 Deploying to ${{ env.ENVIRONMENT }} environment"
+          echo "🔑 Using API Key: $API_KEY"
+          # Add deployment commands here
