@@ -1,15 +1,15 @@
-name: Deploy Pipeline with SemVer Enforcement
+name: Deploy with SemVer Enforcement
 
 on:
   push:
     branches:
       - main  # Deploys to Dev on push
     tags:
-      - 'v*'  # Match all tags but validate using regex
+      - 'v*'  # Matches all tags (v1.2.3, v1.2.3-test, etc.)
 
 jobs:
   deploy_dev:
-    if: github.ref_type == 'branch' && github.ref_name == 'main'
+    if: startsWith(github.ref, 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -20,23 +20,32 @@ jobs:
           # Add Dev deployment commands here
 
   deploy_test:
-    if: github.ref_type == 'tag' && github.ref_name =~ '^v[0-9]+\.[0-9]+\.[0-9]+-test$'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-      - name: Deploy to Test
+      - name: Extract Tag Name
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Check SemVer Test Pattern
         run: |
-          echo "🚀 Deploying ${{ github.ref_name }} to TEST"
-          # Add Test deployment commands here
+          if [[ "$TAG_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-test$ ]]; then
+            echo "✅ Valid Test Release: $TAG_NAME"
+          else
+            echo "❌ Invalid Test Tag: $TAG_NAME"
+            exit 1
+          fi
 
   deploy_prod:
-    if: github.ref_type == 'tag' && github.ref_name =~ '^v[0-9]+\.[0-9]+\.[0-9]+$'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-      - name: Deploy to Prod
+      - name: Extract Tag Name
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Check SemVer Production Pattern
         run: |
-          echo "🚀 Deploying ${{ github.ref_name }} to PRODUCTION"
-          # Add Prod deployment commands here
+          if [[ "$TAG_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "✅ Valid Production Release: $TAG_NAME"
+          else
+            echo "❌ Invalid Production Tag: $TAG_NAME"
+            exit 1
+          fi
+
