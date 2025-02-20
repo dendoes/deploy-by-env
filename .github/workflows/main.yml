@@ -12,11 +12,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ env.env }}  # Set the deployment environment dynamically
     
     permissions:
       contents: read
       id-token: write
+    
+    environment:
+      name: ${{ env.ENV }}  # Set the deployment environment dynamically
     
     steps:
       - name: Checkout code
@@ -26,11 +28,11 @@ jobs:
         id: set-env
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "env=dev" >> $GITHUB_ENV
+            echo "ENV=dev" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" =~ refs/tags/v.*-test ]]; then
-            echo "env=test" >> $GITHUB_ENV
+            echo "ENV=test" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" =~ refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "env=prod" >> $GITHUB_ENV
+            echo "ENV=prod" >> $GITHUB_ENV
           else
             echo "No matching environment" && exit 1
           fi
