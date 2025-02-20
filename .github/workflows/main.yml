@@ -11,24 +11,24 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     outputs:
-      environment: ${{ steps.set_env.outputs.environment }}
+      environment: ${{ steps.set_env.outputs.environment }}  # Passing environment as output
     steps:
       - name: Determine Environment
         id: set_env
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "environment=dev" >> $GITHUB_ENV
-            echo "::set-output name=environment::dev"
+            echo "environment=dev" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" == refs/tags/v*-test* ]]; then
             echo "environment=test" >> $GITHUB_ENV
-            echo "::set-output name=environment::test"
+            echo "environment=test" >> $GITHUB_OUTPUT
           else
             echo "environment=prod" >> $GITHUB_ENV
-            echo "::set-output name=environment::prod"
+            echo "environment=prod" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Deploy
         run: |
@@ -44,3 +44,4 @@ jobs:
       - name: Cleanup Resources
         run: |
           echo "🧹 Cleaning up resources in $ENVIRONMENT environment"
+          echo "using ${{ vars.ENVIRONMENT }}"
