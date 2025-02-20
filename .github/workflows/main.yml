@@ -34,5 +34,5 @@ jobs:
         
       - name: Deploy
         run: |
-          echo "🚀 Deploying to ${{ needs.environment.outputs.environmen }}"
+          echo "🚀 Deploying to ${{ needs.environment.outputs.environment }}"
           echo "Using environment: ${{ vars.ENVIRONMENT }}"
