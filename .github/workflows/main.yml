@@ -17,7 +17,7 @@ jobs:
       - name: Deploy to Dev
         run: |
           echo "🚀 Deploying latest commit to DEV"
-          # Add Dev deployment commands here
+          echo "${{ env.ENVIRONMENT }}"
 
   deploy_test:
     if: startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '-test')
@@ -28,7 +28,7 @@ jobs:
       - name: Deploy to Test
         run: |
           echo "🚀 Deploying Test Version: ${{ github.ref_name }}"
-          # Add Test deployment commands here
+          echo "using ${{ env.ENVIRONMENT }}"
 
   deploy_prod:
     if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-test')
@@ -39,4 +39,4 @@ jobs:
       - name: Deploy to Prod
         run: |
           echo "🚀 Deploying Production Version: ${{ github.ref_name }}"
-          # Add Prod deployment commands here
+          echo "using ${{ env.ENVIRONMENT }}"
