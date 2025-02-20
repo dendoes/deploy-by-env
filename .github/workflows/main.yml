@@ -11,6 +11,7 @@ jobs:
   deploy_dev:
     if: github.ref == 'refs/heads/main'  # Only runs if pushing to main
     runs-on: ubuntu-latest
+    environment: dev
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -22,21 +23,23 @@ jobs:
   deploy_test:
     if: startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '-test')
     runs-on: ubuntu-latest
+    environment: test
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Deploy to Test
         run: |
           echo "🚀 Deploying Test Version: ${{ github.ref_name }}"
-          echo "using ${{ env.ENVIRONMENT }}"
+          echo "using ${{ vars.ENVIRONMENT }}"
 
   deploy_prod:
     if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-test')
     runs-on: ubuntu-latest
+    environment: prod
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Deploy to Prod
         run: |
           echo "🚀 Deploying Production Version: ${{ github.ref_name }}"
-          echo "using ${{ env.ENVIRONMENT }}"
+          echo "using ${{ vars.ENVIRONMENT }}"
