@@ -1,46 +1,42 @@
-name: Deploy
+name: Deploy Pipeline with SemVer Enforcement
 
 on:
   push:
     branches:
-      - main
-  create:
+      - main  # Deploys to Dev on push
     tags:
-      - "v*-test"
-      - "v*.*.*"
+      - 'v*'  # Match all tags but validate using regex
 
 jobs:
-  deploy:
+  deploy_dev:
+    if: github.ref_type == 'branch' && github.ref_name == 'main'
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: read
-      id-token: write
-    
-    environment:
-      name: ${{ env.ENV }}  # Set the deployment environment dynamically
-    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Determine environment
-        id: set-env
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Deploy to Dev
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "ENV=dev" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" =~ refs/tags/v.*-test ]]; then
-            echo "ENV=test" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" =~ refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "ENV=prod" >> $GITHUB_ENV
-          else
-            echo "No matching environment" && exit 1
-          fi
-      
-      - name: Deploy
-        env:
-          SECRET: ${{ secrets.SECRET }}
-          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+          echo "🚀 Deploying latest commit to DEV"
+          # Add Dev deployment commands here
+
+  deploy_test:
+    if: github.ref_type == 'tag' && github.ref_name =~ '^v[0-9]+\.[0-9]+\.[0-9]+-test$'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Deploy to Test
         run: |
-          echo "Deploying to $ENVIRONMENT with secret $SECRET"
-          # Add deployment commands here
+          echo "🚀 Deploying ${{ github.ref_name }} to TEST"
+          # Add Test deployment commands here
+
+  deploy_prod:
+    if: github.ref_type == 'tag' && github.ref_name =~ '^v[0-9]+\.[0-9]+\.[0-9]+$'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Deploy to Prod
+        run: |
+          echo "🚀 Deploying ${{ github.ref_name }} to PRODUCTION"
+          # Add Prod deployment commands here
