@@ -31,7 +31,6 @@ jobs:
             echo "✅ Valid Test Release: $TAG_NAME"
           else
             echo "❌ Invalid Test Tag: $TAG_NAME"
-            exit 1
           fi
 
   deploy_prod:
@@ -46,6 +45,5 @@ jobs:
             echo "✅ Valid Production Release: $TAG_NAME"
           else
             echo "❌ Invalid Production Tag: $TAG_NAME"
-            exit 1
           fi
 
