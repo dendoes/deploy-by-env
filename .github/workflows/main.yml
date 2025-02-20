@@ -12,6 +12,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: ${{ env.env }}  # Set the deployment environment dynamically
     
     permissions:
       contents: read
