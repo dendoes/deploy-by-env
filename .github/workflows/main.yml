@@ -2,6 +2,8 @@ name: Deploy with SemVer Enforcement
 
 on:
   push:
+    paths:
+      - 'deploy/**'
     branches:
       - main  # Deploys to Dev on push
     tags:
